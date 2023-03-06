@@ -5,12 +5,12 @@ db = SQLAlchemy()
 
 
 favorite_location = db.Table('favorite_location_association',
-    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
-    db.Column("location_id", db.Integer, db.ForeignKey("location.id"), primary_key=True)
+    db.Column("user_id", db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), primary_key=True),
+    db.Column("location_id", db.Integer, db.ForeignKey("location.id", ondelete="CASCADE"), primary_key=True)
 )
 favorite_equipment = db.Table('favorite_equipment_association',
-    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
-    db.Column("equipment_id", db.Integer, db.ForeignKey("equipment.id"), primary_key=True)
+    db.Column("user_id", db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), primary_key=True),
+    db.Column("equipment_id", db.Integer, db.ForeignKey("equipment.id", ondelete="CASCADE"), primary_key=True)
 )
 
 class User(db.Model):
@@ -22,10 +22,12 @@ class User(db.Model):
     equipment_id = db.Column(db.Integer, db.ForeignKey("equipment.id"))
     location = db.relationship("Location",
                     secondary=favorite_location,
-                    back_populates="user")
+                    back_populates="user",
+                    cascade="all, delete")
     equipment = db.relationship("Equipment",
                     secondary=favorite_equipment,
-                    back_populates="user")
+                    back_populates="user",
+                    cascade="all, delete")
 
     def __ref__(self):
         return f'<User {self.email}>'
@@ -46,7 +48,8 @@ class Location(db.Model):
     alert = db.relationship('Alert', backref='parent',lazy=True)
     user = db.relationship("User",
                     secondary=favorite_location,
-                    back_populates="location")
+                    back_populates="location",
+                    passive_deletes=True,)
                     
     def __ref__(self):
         return f'<Location {self.name}>'
@@ -66,7 +69,8 @@ class Equipment(db.Model):
     activity = db.relationship('Activity', backref='parent',lazy=True)
     user = db.relationship("User",
                     secondary=favorite_equipment,
-                    back_populates="equipment")
+                    back_populates="equipment",
+                    passive_deletes=True,)
 
     def __ref__(self):
         return f'<Equipment {self.name}>'
