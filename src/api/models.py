@@ -20,11 +20,11 @@ class User(db.Model):
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
     location_id = db.Column(db.Integer, db.ForeignKey("location.id"))
     equipment_id = db.Column(db.Integer, db.ForeignKey("equipment.id"))
-    location = db.relationship("Location",
+    favorite_location = db.relationship("Location",
                     secondary=favorite_location,
                     back_populates="user",
                     cascade="all, delete")
-    equipment = db.relationship("Equipment",
+    favorite_equipment = db.relationship("Equipment",
                     secondary=favorite_equipment,
                     back_populates="user",
                     cascade="all, delete")
@@ -36,8 +36,8 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
-            "location": list(map(lambda x: x.serialize(), self.location)),
-            "equipment": list(map(lambda x: x.serialize(), self.equipment))
+            "favorite_location": list(map(lambda x: x.serialize_without_user(), self.favorite_location)),
+            "favorite_equipment": list(map(lambda x: x.serialize_without_user(), self.favorite_equipment))
             # do not serialize the password, its a security breach
         }
 
@@ -45,11 +45,11 @@ class Location(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    alert = db.relationship('Alert', backref='parent',lazy=True)
+    # alert = db.relationship('Alert', backref='parent',lazy=True)
     user = db.relationship("User",
                     secondary=favorite_location,
-                    back_populates="location",
-                    passive_deletes=True,)
+                    back_populates="favorite_location",
+                    passive_deletes=True)
                     
     def __ref__(self):
         return f'<Location {self.name}>'
@@ -59,7 +59,14 @@ class Location(db.Model):
             "id": self.id,
             "name": self.name,
             "user": list(map(lambda x: x.serialize(), self.user)),
-            "alert": list(map(lambda x: x.serialize(), self.alert))
+            # "alert": list(map(lambda x: x.serialize(), self.alert))
+        }
+
+    def serialize_without_user(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            # "alert": list(map(lambda x: x.serialize(), self.alert))
         }
 
 class Equipment(db.Model):
@@ -69,8 +76,8 @@ class Equipment(db.Model):
     activity = db.relationship('Activity', backref='parent',lazy=True)
     user = db.relationship("User",
                     secondary=favorite_equipment,
-                    back_populates="equipment",
-                    passive_deletes=True,)
+                    back_populates="favorite_equipment",
+                    passive_deletes=True)
 
     def __ref__(self):
         return f'<Equipment {self.name}>'
@@ -83,19 +90,26 @@ class Equipment(db.Model):
             "activity": list(map(lambda x: x.serialize(), self.activity))
         }
 
-class Alert(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(250), nullable=False)
-    location_id = db.Column(db.Integer, db.ForeignKey("location.id"), nullable=False)
-
-    def __repr__(self):
-        return self.type
-        
-    def serialize(self):
+    def serialize_without_user(self):
         return {
             "id": self.id,
-            "type": self.type,
+            "name": self.name,
+            "activity": list(map(lambda x: x.serialize(), self.activity))
         }
+
+# class Alert(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     type = db.Column(db.String(250), nullable=False)
+#     location_id = db.Column(db.Integer, db.ForeignKey("location.id"), nullable=False)
+
+#     def __repr__(self):
+#         return self.type
+        
+#     def serialize(self):
+#         return {
+#             "id": self.id,
+#             "type": self.type,
+#         }
 
 class Activity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
