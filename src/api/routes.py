@@ -34,7 +34,7 @@ def get_user():
     all_users = list(map(lambda x: x.serialize(), users))
     return jsonify(all_users), 200
 
-@api.route('/user/1', methods=['DELETE'])
+@api.route('/user/<int:user_id>', methods=['DELETE'])
 def delete_account(user_id):
     user = db.session.query(User).get(user_id)
     db.session.delete(user)
