@@ -18,6 +18,11 @@ export const Navbar = () => {
 						<span>Social</span>
 					</Link>
 				</div>
+				<div className="ml-auto">
+					<Link to="/login" style={{textDecoration:'none', color:'white'}}>
+						<span>Login</span>
+					</Link>
+				</div>
 			</div>
 		</nav>
 	);

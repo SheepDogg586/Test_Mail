@@ -23,7 +23,7 @@ export const Home = () => {
 	}
 	useEffect(() => {
 		const loader = new Loader({
-		apiKey: "AIzaSyCiBrtiZK1x072QJ5-d1d8fWXmJhfZSkrs",
+		apiKey: "MAP_KEY",
 		version: "weekly",
 	});
     loader.load().then(() => {
@@ -74,16 +74,19 @@ export const Home = () => {
         		Search
         	</button>
     	</form>
-		<div className="container text-center" style={{width:'45px',height:'100px', border:'solid black', position:'absolute', zIndex:'3', marginLeft:'96%', marginTop:'25%'}}>
+		<div className="container text-center" style={{width:'45px',height:'100px', position:'absolute', zIndex:'3', marginLeft:'97%', marginTop:'40vh', paddingBottom: '5px'}}>
 			<div className="row">
-    			<div className="col" style={{borderBottom:'solid black'}}>
-					Column
+    			<div className="col" style={{border:'solid black', background:'white'}}>
+					storm icon
     			</div>
-    			<div className="col" style={{borderBottom:'solid black'}}>
-    				Column
+    			<div className="col" style={{border:'solid black', background:'white'}}>
+    				shark icon
     			</div>
-    			<div className="col" style={{borderBottom:'solid black'}}>
-    				Column
+    			<div className="col" style={{border:'solid black', background:'white'}}>
+    				fish icon
+    			</div>
+				<div className="col" style={{border:'solid black', background:'white'}}>
+    				waves icon
     			</div>
 			</div>
 		</div>
