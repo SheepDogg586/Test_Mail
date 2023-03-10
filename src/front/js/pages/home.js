@@ -3,6 +3,10 @@ import { Context } from "../store/appContext";
 import { Loader } from "@googlemaps/js-api-loader";
 import {States} from "../store/states"
 import "../../styles/home.css";
+import Shark from "../../img/sharkicon.png";
+import Fish from "../../img/fishingicon.png";
+import Storm from "../../img/stormicon.png";
+import Rip from "../../img/wavesicon.png";
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
@@ -23,7 +27,7 @@ export const Home = () => {
 	}
 	useEffect(() => {
 		const loader = new Loader({
-		apiKey: "MAP_KEY",
+		apiKey: process.env.MAP_KEY,
 		version: "weekly",
 	});
     loader.load().then(() => {
@@ -76,21 +80,21 @@ export const Home = () => {
     	</form>
 		<div className="container text-center" style={{width:'45px',height:'100px', position:'absolute', zIndex:'3', marginLeft:'97%', marginTop:'40vh', paddingBottom: '5px'}}>
 			<div className="row">
-    			<div className="col" style={{border:'solid black', background:'white'}}>
+    			<div className="col" style={{border:'solid black', backgroundImage:`url(${Storm})`}}>
 					storm icon
     			</div>
-    			<div className="col" style={{border:'solid black', background:'white'}}>
+    			<div className="col" style={{border:'solid black', backgroundImage:`url(${Shark})`}}>
     				shark icon
     			</div>
-    			<div className="col" style={{border:'solid black', background:'white'}}>
+    			<div className="col" style={{border:'solid black', backgroundImage:`url(${Fish})`}}>
     				fish icon
     			</div>
-				<div className="col" style={{border:'solid black', background:'white'}}>
+				<div className="col" style={{border:'solid black', backgroundImage:`url(${Rip})`}}>
     				waves icon
     			</div>
 			</div>
 		</div>
-    <div className="map col-12" id="map" style={{ height: "90vh" }}></div>
+    <div className="map col-12" id="map" style={{ height: "87vh" }}></div>
     </div>
 	);
 };
