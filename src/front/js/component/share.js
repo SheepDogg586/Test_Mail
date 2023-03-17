@@ -5,8 +5,8 @@ import {PermMedia, Room} from "@material-ui/icons";
 export default function Share() {
   return (
     <div className='share'>
-      <div className="shareWrapper">
-        <div className="shareTop">
+      <div className="shareWrapper" style={{backgroundColor:'whitesmoke', opacity:'0.9'}}>
+        <div className="shareTop" >
             <img className='shareProfileImg' src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLkMwkK_sXb8umT6qkgVgaOhmpyl43r702vwd7zlzsgw&s" alt="" />
             <input placeholder="Share about your experience!" className='shareInput'/>
         </div>
