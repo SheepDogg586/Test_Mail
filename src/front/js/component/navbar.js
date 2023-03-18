@@ -23,20 +23,6 @@ export const Navbar = () => {
 						<span>Social</span>
 					</Link>
 				</div>
-				<div className="ml-auto">
-					<Link to="/profile" style={{textDecoration:'none', color:'white'}}>
-						<span>Profile</span>
-					</Link>
-				</div>
-				<div className="ml-auto">
-					{ !store.token ?
-						<Link to="/login" style={{textDecoration:'none', color:'white'}}>
-							<span>Login</span>
-						</Link>
-						:
-						<span style={{textDecoration:'none', color: 'white'}} onClick={() => actions.logout()}>Logout</span>
-					}
-				</div>
 			</div>
 		</nav>
 	);
