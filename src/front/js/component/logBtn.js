@@ -8,7 +8,7 @@ export const LoginButton = () => {
 
   const handleLogout = () => {
     actions.logout();
-    navigate.push("/");
+    navigate("/profile");
   };
 
   return (

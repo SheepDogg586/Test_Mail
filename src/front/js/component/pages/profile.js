@@ -6,7 +6,8 @@ import { LoginButton } from "../logBtn";
 export const Profile = () => {
   const { username } = useParams();
   const [posts, setPosts] = useState([]);
-
+  const [loggedIn, setLoggedIn] = useState([]);
+  
   useEffect(() => {
     // Fetch posts for the user with the given username
     fetch(`/api/posts?username=${username}`)
@@ -22,12 +23,9 @@ export const Profile = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        
+        flexDirection: 'column'
       }}
     >
-      <div className="logout">
-        <LoginButton />
-      </div>
       <div className="profileSheet">
         <h1>{username}'s Profile</h1>
         {posts.length > 0 ? (
@@ -35,6 +33,9 @@ export const Profile = () => {
         ) : (
           <p>No posts yet!</p>
         )}
+      </div>
+      <div className="logout" style = {{display: ''}}>
+        <LoginButton />
       </div>
     </div>
   );

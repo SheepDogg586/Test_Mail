@@ -8,6 +8,7 @@ import { Social } from "./pages/social";
 import { Contact } from "./pages/contact";
 import { Profile } from "./component/pages/profile";
 import { Login } from "./component/pages/login";
+import { Register } from "./component/pages/register";
 import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/navbar";
@@ -32,6 +33,7 @@ const Layout = () => {
             <Route element={<Contact />} path="/contact" />
             <Route element={<Profile />} path="/profile" />
             <Route element={<Login />} path="/login" />
+            <Route element={<Register/>} path = "/register" />
             <Route element={<h1>Not found!</h1>} />
           </Routes>
           <Footer />
