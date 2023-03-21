@@ -7,8 +7,8 @@ from api.models import db, User
 from api.utils import generate_sitemap, APIException
 import hashlib
 import re
-import smtplib
-import uuid
+
+
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -31,30 +31,7 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
-reset_id = 0
-@api.route("/password", methods=["POST"])
-def forgot_password():
-    body = request.get_json()
-    email = body["email"]
-    subject = "password reset request"
-    reset_id = str(uuid.uuid4()) 
-    message = "Here's your password reset link: " + str(os.getenv("BACKEND_URL")) + "/api/password-change/" + reset_id
-    sender_email = "thewaves64@gmail.com"
-    sender_password = os.getenv("EPASSWORD")
-    print(sender_password)
-    msg = MIMEMultipart()
-    msg['From'] = sender_email
-    msg['To'] = email
-    msg['Subject'] = subject
-    msg.attach(MIMEText(message, "plain"))
-    try:
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.login(sender_email, sender_password)
-        server.sendmail(sender_email, recipient, msg.as_string())
-        server.quit()
-        return 'Email sent successfully!'
-    except Exception as e:
-        return f'Error sending email: {e}'
+
 
 @api.route("/register", methods=["POST"])
 def register():

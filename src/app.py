@@ -2,6 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
+from flask_mail import Mail, Message
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
@@ -12,6 +13,8 @@ from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_jwt_extended import JWTManager
+import smtplib
+import uuid
 
 #from models import Person
 
@@ -22,6 +25,14 @@ app.url_map.strict_slashes = False
 
 app.config["JWT_SECRET_KEY"] = "JWT-DEVELOPMENT"  # Change this!
 jwt = JWTManager(app)
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'thewaves64@gmail.com'
+app.config['MAIL_PASSWORD'] = os.getenv("EPASSWORD")
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -67,7 +78,19 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0 # avoid cache memory
     return response
 
-
+reset_id = 0
+@app.route("/password", methods=["POST"])
+def forgot_password():
+    body = request.get_json()
+    email = body["email"]
+    subject = "password reset request"
+    reset_id = str(uuid.uuid4()) 
+    message = "Here's your password reset link: " + str(os.getenv("BACKEND_URL")) + "/api/password-change/" + reset_id
+    sender_email = "thewaves64@gmail.com"
+    msg = Message(subject, sender = sender_email, recipients = [email])
+    msg.body = message
+    mail.send(msg)
+    return jsonify("Email sent successfully")
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
