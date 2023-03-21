@@ -6,7 +6,6 @@ import { LoginButton } from "../logBtn";
 export const Profile = () => {
   const { username } = useParams();
   const [posts, setPosts] = useState([]);
-  const [loggedIn, setLoggedIn] = useState([]);
   
   useEffect(() => {
     // Fetch posts for the user with the given username

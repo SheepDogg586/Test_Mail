@@ -10,6 +10,13 @@ export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios.post("/api/",{email})
+    .then((response) => {console.log("Check your email");
+  })
+    .catch((error) => {console.log("Error")})
+  };
 
   console.log("This is your token", store.token);
   const handleClick = () => {
@@ -26,8 +33,9 @@ export const Login = () => {
       {store.token && store.token != "" && store.token != undefined ? (
         "You are logged in with this token" + store.token
       ) : (
-        <div className="container" style = {{justifyContent: 'center', alignItems: 'center', display: 'flex', flexDirection: 'column'}}>
+        <form className="container" style = {{justifyContent: 'center', alignItems: 'center', display: 'flex', flexDirection: 'column'}} onSubmit = {(e) => e.preventDefault()}>
           <input
+            required = "required"
             type="text"
             placeholder="Email"
             value={email}
@@ -40,9 +48,10 @@ export const Login = () => {
               boxSizing: "border-box",
               borderRadius: '15px'
             }}
-            required
+            
           />
           <input
+            required = "required"
             type="password"
             placeholder="Password"
             value={password}
@@ -55,7 +64,6 @@ export const Login = () => {
               boxSizing: "border-box",
               borderRadius: '15px'
             }}
-            required
           />
           <div className = "button-container" style = {{}}>
             <button
@@ -67,19 +75,23 @@ export const Login = () => {
                 margin: "8px 20px",
                 border: "none",
                 cursor: "pointer",
-                width: "30%",
+                width: "70%",
                 borderRadius: "15px",
                 textAlign: "center",
               }}
             >
               Login
             </button>
-            <a href = '/register'>
-            <button style = {{backgroundColor: "red", color: "white", cursor: "pointer", borderRadius: "15px", border: "none", padding: "14px 20px", margin: "8px 0"}}>Sign up here!</button>
-            </a>
           </div>
-        </div>
+        </form>
       )}
+      <form onSubmit = {handleSubmit}>
+        
+      </form>
+      <a href = '/register'>
+        <button style = {{backgroundColor: "red", color: "white", cursor: "pointer", borderRadius: "15px", border: "none", padding: "14px 20px", margin: "8px 0"}}>Sign up here!</button>
+      </a>
+      <button style = {{backgroundColor: "black", color: "white", cursor: "pointer", borderRadius: "15px", border: "none", padding: "14px 20px", margin: "8px 0"}}>Forgot Password?</button>
     </div>
   );
 };

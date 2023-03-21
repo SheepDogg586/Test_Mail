@@ -1,12 +1,21 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
+import os
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User
 from api.utils import generate_sitemap, APIException
+import hashlib
+import re
+import smtplib
+import uuid
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
+
 
 api = Blueprint('api', __name__)
 
@@ -22,46 +31,82 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
+reset_id = 0
+@api.route("/password", methods=["POST"])
+def forgot_password():
+    body = request.get_json()
+    email = body["email"]
+    subject = "password reset request"
+    reset_id = str(uuid.uuid4()) 
+    message = "Here's your password reset link: " + str(os.getenv("BACKEND_URL")) + "/api/password-change/" + reset_id
+    sender_email = "thewaves64@gmail.com"
+    sender_password = os.getenv("EPASSWORD")
+    print(sender_password)
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(message, "plain"))
+    try:
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.login(sender_email, sender_password)
+        server.sendmail(sender_email, recipient, msg.as_string())
+        server.quit()
+        return 'Email sent successfully!'
+    except Exception as e:
+        return f'Error sending email: {e}'
+
 @api.route("/register", methods=["POST"])
 def register():
-  if request.method == 'POST':
-    request_body = request.get_json()
-    username = request_body.get('username')
-    email = request_body.get('email')
-    password = request_body.get('password')
+    data = request.get_json()
 
-    if not username or not email or not password:
-        if not username:
-            return jsonify({"msg": "Username is required"}), 400
-        if not email:
-            return jsonify({"msg": "Email is required"}), 400
-        if not password:
-            jsonify({"msg": "Password is required"}), 400
+    if not data:
+        return jsonify({'error': 'Missing JSON data'}), 400
 
+    email = data.get('email')
+    password = data.get('password')
 
-    user = User.query.filter_by(email=request_body["email"]).first()
-    if user:
-      return jsonify({"msg": "User already exists"}), 400
+    if not email:
+        return jsonify({'error': 'Missing email field'}), 400
+    if not password:
+        return jsonify({'error': 'Missing password field'}), 400
 
-    user = User(
-          username = username,
-          email = email,
-          password = generate_password_hash(password),
-      )
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        return jsonify({'error': 'Invalid email format'}), 400
 
-    db.session.add(user)   
+    if len(password) < 8:
+        return jsonify({'error': 'Password must be at least 8 characters long'}), 400
+
+    has_email = User.query.filter_by(email=email).first()
+    if has_email is not None:
+        return jsonify({'error': 'Email already exists'}), 409
+
+    hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+
+    new_user = User(email=email, password=hashed_password, is_active=True)
+    db.session.add(new_user)
     db.session.commit()
-    return jsonify({"created": "Thanks. Your registration was successfully", "status": "true"}), 200
 
-@api.route("/token", methods=["POST"])
+    return jsonify({'message': 'Successfully created account!'}), 201
+
+@api.route('/login', methods = ['POST'])
 def login():
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
-    if email != "" or password != "":
-        return jsonify({"msg": "Bad email or password"}), 401
+    body = request.get_json(force = True)
+    email = body['email']
+    password = hashlib.sha256(body['password'].encode("utf-8")).hexdigest()
+    print(password)
+    has_user = User.query.filter_by(email = email, password = password).first()
+    if has_user is not None:
+        access_token = create_access_token(identity = email)
+        return jsonify(access_token = access_token), 200
 
-    access_token = create_access_token(identity=email)
-    return jsonify(access_token=access_token)
+    return jsonify('Invalid credentials'), 400
+
+@api.route("/token", methods=["GET"])
+@jwt_required()
+def validate_identity():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as = current_user)
 
 @api.route('/user', methods=['POST'])
 def create_user():
